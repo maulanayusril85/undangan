@@ -213,3 +213,75 @@ document.addEventListener('DOMContentLoaded', function(){
   els.forEach(el => el.textContent = name);
 })();
 
+
+// Autoplay musik: coba play dengan suara; jika gagal => play muted, tunggu tap pertama untuk unmute
+document.addEventListener('DOMContentLoaded', function(){
+  const audio = document.getElementById('bgMusic');
+  const btn   = document.getElementById('musicToggle');
+  if(!audio || !btn) return;
+
+  const setBtn = ()=>{
+    const on = !audio.paused && !audio.muted;
+    btn.textContent = on ? '🔊 Musik' : (audio.paused ? '▶️ Musik' : '🔇 Musik');
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  };
+
+  const tryPlay = async (withSound=true)=>{
+    audio.muted = !withSound;
+    try{
+      await audio.play();
+      setBtn();
+      return true;
+    }catch(e){
+      return false;
+    }
+  };
+
+  // 1) Coba langsung dengan suara (kalau user sudah mengizinkan sebelumnya)
+  const allowed = localStorage.getItem('musicAllowed') === '1';
+  (async ()=>{
+    let ok = false;
+    if (allowed) ok = await tryPlay(true);
+    if (!ok) {
+      // 2) Coba tanpa izin awal: tetap coba dengan suara sekali
+      ok = await tryPlay(true);
+      if (!ok) {
+        // 3) Ditolak: putar muted + nyalakan hint agar user tap
+        await tryPlay(false);
+        document.documentElement.classList.add('music-hint');
+      }
+    }
+  })();
+
+  // Tap pertama di mana saja => unmute & simpan izin
+  const unlock = async ()=>{
+    if (audio.muted || audio.paused){
+      const ok = await tryPlay(true);
+      if (ok){
+        localStorage.setItem('musicAllowed','1');
+        document.documentElement.classList.remove('music-hint');
+        window.removeEventListener('pointerdown', unlock);
+        window.removeEventListener('keydown', unlock);
+      }
+    }
+  };
+  window.addEventListener('pointerdown', unlock);
+  window.addEventListener('keydown', unlock);
+
+  // Tombol manual
+  btn.addEventListener('click', async ()=>{
+    if (audio.paused || audio.muted){
+      const ok = await tryPlay(true);
+      if (ok){
+        localStorage.setItem('musicAllowed','1');
+        document.documentElement.classList.remove('music-hint');
+      }
+    }else{
+      audio.pause();
+    }
+    setBtn();
+  });
+
+  setBtn();
+});
+
