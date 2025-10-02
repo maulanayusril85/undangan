@@ -1,0 +1,521 @@
+/* ====== FONT & WARNA ====== */
+:root {
+  --bg:#f7f6f2;
+  --paper:#ffffff;
+  --ink:#1d1d1f;
+  --muted:#6b7280;
+  --gold:#b08d57;
+  --cocoa:#91633c;
+  --shadow: 0 24px 60px rgba(0,0,0,.08);
+}
+
+
+body {
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+html { scroll-behavior: smooth; }
+
+img {max-width:100%;display:block}
+
+.container {width:min(1080px, 90%); margin-inline:auto}
+
+.text-center {text-align:center}
+
+.muted {color:var(--muted)}
+
+/* Buttons (umum) */
+.btn {
+  display:inline-block; padding:.8rem 1.1rem;
+  border-radius:999px; border:1px solid transparent;
+  font-weight:700; text-decoration:none;
+}
+
+/* Hero */
+.hero {position:relative; min-height:100vh; overflow:hidden; isolation:isolate}
+
+.hero__bg {position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:contrast(105%) saturate(104%)}
+
+.hero__veil {position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.25) 45%, rgba(0,0,0,.55))}
+
+.hero__inner {
+  position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  height:100%; gap:12px; color:#fff; text-align:center; padding-top:10vh;
+}
+
+.eyebrow {
+  letter-spacing:.25em; text-transform:uppercase; font-weight:600; opacity:.9;
+  font-size: 2rem;
+}
+
+/* lebih aman di semua layar */
+.display {
+  font-size: clamp(3rem, 9vw, 10rem);
+  letter-spacing:.02em; margin:.2rem 0; font-weight:100;
+}
+
+#eventDate {font-size: 1.5rem;}
+
+.crest span {opacity:.9}
+
+/* Tombol glassy (mis. hero) */
+.btn1 {
+  display:inline-block; padding:.85rem 1.2rem;
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.6);
+  border-radius:14px;
+  color:#fff; font-weight:700; text-decoration:none;
+  letter-spacing:.25em; text-transform:uppercase;
+  backdrop-filter: blur(6px);
+  box-shadow:var(--shadow);
+
+}
+
+.btn1:hover { background:rgba(255,255,255,.28); transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,.28) }
+
+/* Countdown */
+.countdown {display:grid; grid-template-columns:repeat(4,1fr); gap:10px; width:min(460px, 92%); margin:10px auto 16px}
+
+.countdown .cell {background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.6); border-radius:14px; padding:10px 6px; color:#fff; text-align:center; backdrop-filter: blur(6px); box-shadow:var(--shadow)}
+
+.countdown .num {font-weight:800; font-size:1.45rem}
+
+.countdown .lbl {font-size:.78rem; opacity:.92}
+
+
+.section, .gallery {
+  background:
+    linear-gradient(rgba(255,255,255,.8), rgba(255,255,255,.8)),
+    url("img/bg hero.jpg");
+  background-position:center;
+  background-size: cover;          /* lebih aman daripada 50vh */
+  background-repeat:no-repeat;
+}
+
+.h2 {
+  text-align:center;
+}
+
+/* People */
+.grid {display:grid; gap:22px}
+
+.grid.two {grid-template-columns:1fr}
+
+@media(min-width:760px) {
+.grid.two {grid-template-columns:1fr 1fr}
+}
+
+.person .frame {border-radius:22px; overflow:hidden; position:relative; box-shadow:var(--shadow); background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,.08)); border: 3px solid rgba(176,141,87,.55)}
+
+.person img {width:100%; height:380px; object-fit:cover; transform:scale(1.02); transition:transform .4s ease}
+
+.person:hover img {transform:scale(1.06)}
+
+.nama, .namapanjang, .deskripsi, .miring {text-align:center}
+
+.katakata, .namasurat {text-align: center; backdrop-filter:var(--shadow);}
+
+/* ====== EVENT SPLIT ala screenshot (dua kolom + garis tengah) ====== */
+.section--event-split {
+  background: radial-gradient(1200px 600px at 50% 0%, rgba(0,0,0,.08), transparent 50%), #b7aa98;
+  color: #f6f2ec;
+  padding:20px 0;                 /* pastikan cukup ruang */
+}
+
+.event-split {
+  position:relative;
+  display:grid; grid-template-columns:1fr 1fr; gap:48px;
+  text-align:center;
+}
+
+.event-split::before {
+  content:""; position:absolute; top:6%; bottom:6%; left:50%; width:1px;
+  background: linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,.2));
+  transform: translateX(-.5px);
+}
+
+.event-box { padding:16px 10px }
+
+.event-title {
+  letter-spacing:.02em;
+}
+
+.event-sub { margin:4px 0; font-weight:600; opacity:.95 }
+
+.event-venue { margin:18px 0 2px; opacity:.95 }
+
+.event-addr { margin:0 0 20px; opacity:.9 }
+
+/* tombol pill untuk Google Maps */
+.btn--pill, .btn1.btn--pill { /* jika ingin pakai .btn1 juga */
+  background: rgba(255,255,255,.9);
+  color:#6f6658;
+  border-radius:999px;
+  padding:.8rem 1.2rem;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  box-shadow:0 8px 24px rgba(0,0,0,.15);
+  border:1px solid rgba(255,255,255,.9);
+}
+
+.btn--pill:hover { background:#fff }
+
+/* ===== Scroll-reveal animation (simple) ===== */
+.reveal {opacity:0; transform: translateY(16px)}
+
+.reveal.show {opacity:1; transform:none; transition: opacity .7s ease, transform .7s ease}
+
+@media (prefers-reduced-motion: reduce) {
+.reveal {opacity:1; transform:none}
+.reveal.show {transition:none}
+}
+
+/* Footer */
+.footer {padding:12px 0}
+
+.copy {color:var(--muted); font-size:.9rem}
+
+/* Minimal base */
+:root {
+  --bg:#f7f6f2; --paper:#ffffff; --ink:#1d1d1f; --muted:#6b7280;
+  --shadow: 0 24px 60px rgba(0,0,0,.08);
+}
+
+html, body {margin:0;padding:0}
+
+body {line-height:1.7}
+
+.container {width:min(1080px, 90%); margin-inline:auto}
+
+.h2 {text-align:center}
+
+.display {transform:none; transition: opacity .7s ease, transform .7s ease}
+
+/* Responsif (tetap square karena aspect-ratio) */
+@media (max-width: 1100px){ .gallery5{ grid-template-columns: repeat(4, 1fr) } }
+@media (max-width: 760px){  .gallery5{ grid-template-columns: repeat(3, 1fr) } }
+@media (max-width: 520px){  .gallery5{ grid-template-columns: repeat(2, 1fr) } }
+
+
+hr {
+  border: none;
+  border-top: 3px solid #cbbdb6; /* garis tipis abu-abu */
+  margin: 20px 0;
+}
+
+.gallery-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .gallery-container img {
+    width: 200px;   /* Bisa diubah sesuai kebutuhan */
+    height: 250px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: transform 0.3s;
+  }
+
+  .gallery-container img:hover {
+    transform: scale(1.05);
+  }
+
+  /* Animasi fade-up */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+
+  .fade-up.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+/* =========================================================
+   MOBILE OPTIMIZATION (≤ 600px & friends)
+   ========================================================= */
+
+/* Fluid headings & text */
+.h2, h2{ font-size: clamp(1.25rem, 4.5vw, 2.1rem); }
+.katakata, .namasurat{ font-size: clamp(.9rem, 2.8vw, 1.125rem); line-height: 1.7; }
+
+@media (max-width: 900px){
+  .container{ width: min(100%, 94%); }
+}
+
+@media (max-width: 600px){
+  .section, .gallery{ padding: 28px 0; }
+  .container{ width: min(100%, 94%); }
+
+  .hero{ min-height: 75vh; }
+  .hero__inner{ padding-top: 6vh; gap: 8px; }
+  .eyebrow{ font-size: 1rem; letter-spacing: .18em; }
+  .display{ font-size: clamp(2.2rem, 10vw, 4rem); }
+  #eventDate{ font-size: 1rem; }
+
+  .countdown .num{ font-size: 1.1rem; }
+  .countdown .lbl{ font-size: .72rem; }
+
+  .event-split{ grid-template-columns: 1fr; gap: 14px; }
+  .event-split::before{ display:none; }
+  .event-box{ padding: 12px 10px; }
+  .event-title{ font-size: 1.25rem; }
+  .event-sub{ font-size: .95rem; }
+  .event-venue, .event-addr{ font-size: .95rem; }
+
+  .btn, .btn1, .btn--pill{
+    padding: .6rem .9rem;
+    font-size: .9rem;
+    letter-spacing: .12em;
+  }
+
+  .gallery-container img{
+    width: 44vw;
+    height: 56vw;
+    max-width: 180px;
+  }
+}
+
+@media (max-width: 380px){
+  .display{ font-size: clamp(2rem, 12vw, 3.2rem); }
+  .btn, .btn1, .btn--pill{ padding: .55rem .8rem; font-size: .88rem; }
+  .event-title{ font-size: 1.15rem; }
+}
+
+/* === HERO FULL-SCREEN DI MOBILE === */
+@media (max-width: 600px){
+  .hero{
+    /* fallback -> modern */
+    min-height: 100vh;   /* fallback lama */
+    min-height: 100svh;  /* iOS/Android: small viewport height */
+    min-height: 100dvh;  /* browser modern: dynamic viewport height */
+  }
+  .hero__inner{
+    padding-top: 0;      /* hapus offset supaya benar2 center */
+  }
+}
+
+/* --- Hero: full screen & teks tepat di tengah pada mobile --- */
+@media (max-width: 600px){
+  .hero{
+    min-height: 100vh;   /* fallback */
+    min-height: 100svh;  /* iOS/Android small viewport */
+    min-height: 100dvh;  /* browser modern */
+  }
+  .hero__inner{
+    min-height: inherit;  /* kunci centering */
+    padding-top: 0;       /* hilangkan offset */
+    justify-content: center;
+  }
+  .hero__inner > *:first-child{ margin-top: 0; }
+  .hero__inner > *:last-child{  margin-bottom: 0; }
+}
+
+.reveal{
+  opacity: 0;
+  transform: translateY(22px);
+  will-change: transform, opacity;
+}
+.reveal.show{
+  opacity: 1;
+  transform: none;
+  transition: opacity 1s ease, transform 1s ease; /* 1 detik */
+}
+
+/* ===== Mobile tuning untuk section Home / Love-verse / Mempelai ===== */
+@media (max-width: 600px){
+  /* ruang section & lebar container */
+  #home.section{ padding: 28px 0; }
+  #home .container{ width: min(100%, 94%); }
+
+  /* judul section */
+  #home .h2{ font-size: clamp(1.2rem, 5.6vw, 1.6rem); margin-bottom: 12px; }
+
+  /* Foto besar + kartu kutipan (love-verse) */
+  #love-verse .lv-photo{
+    max-width: 94vw;
+    margin: 0 auto 10px;
+    border-radius: 12px;
+    border-width: 4px;           /* bingkai lebih tipis di HP */
+    overflow: hidden;
+  }
+  #love-verse .lv-photo img{
+    width: 100%;
+    height: auto;
+    max-height: 48vh;            /* sesuaikan 44–52vh */
+    object-fit: cover;
+    display: block;
+  
+  }
+
+  /* Opsi A: KARTU DI BAWAH FOTO (bukan overlay) */
+  #love-verse .lv-card{
+    position: relative;          /* pastikan bukan absolute */
+    inset: auto;                 /* reset top/right/bottom/left */
+    left:auto; right:auto; top:auto; bottom:auto;
+    display: block;
+    max-width: 94vw;
+    margin: 8px auto 0;          /* kasih jarak dari foto */
+    padding: 14px 12px;
+    border-radius: 12px;
+    border-width: 4px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(0,0,0,.08);
+  }
+
+  /* Typografi ringkas kartu */
+  #love-verse .lv-initials{
+    font-size: clamp(1.05rem, 5.6vw, 1.4rem);
+    letter-spacing: .12em;
+    margin: 0 0 6px;
+  }
+  #love-verse .lv-quote{
+    font-size: clamp(.9rem, 3.6vw, 1rem);
+    line-height: 1.6;
+    margin: 0 0 6px;
+  }
+  #love-verse .lv-source{ font-size: .9rem; margin: 0; }
+
+  /* Grid mempelai: 2 kolom -> 1 kolom, foto & teks lebih mungil */
+  #home .grid.two{ grid-template-columns: 1fr; gap: 14px; }
+  #home .person .frame{ border-radius: 12px; }
+  #home .person .frame img{
+    width: 100%;
+    height: 260px;               /* kamu boleh set 240–300px */
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Typografi mempelai */
+  #home .nama{        font-size: clamp(1.05rem, 5.2vw, 1.35rem); font-weight: 700; }
+  #home .namapanjang{ font-size: clamp(1rem,   4.8vw, 1.2rem); }
+  #home .deskripsi{   font-size: clamp(.9rem,  3.6vw, 1rem); line-height: 1.6; }
+}
+
+#love-verse .lv-photo{ background: var(--paper, #fff); }
+#love-verse .lv-photo img{
+  display:block; width:100%; height:auto; object-fit:cover;
+  /* fade 70% terakhir jadi transparan */
+  -webkit-mask-image: linear-gradient(to bottom, #ffffff 40%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #ffffff 40%, transparent 100%);
+}
+
+#love-verse .lv-photo{ position: relative; overflow: hidden; background: var(--paper,#fff); }
+#love-verse .lv-photo::after{
+  content:""; position:absolute; left:0; right:0;
+  bottom: -12px;                 /* turun sedikit menimpa area kartu */
+  height: min(24vh, 220px);      /* tinggi gradasi */
+  pointer-events:none;
+  background: linear-gradient(to bottom,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.8) 72%,
+    var(--paper,#fff) 100%
+  );
+}
+
+/* Perbesar .nama di mobile */
+@media (max-width: 600px){
+  #home .nama{
+    font-weight: 200;
+    font-size: clamp(2rem, 10.5vw, 2.8rem); /* Naik dari versi sebelumnya */
+    line-height: 1.15;                         /* biar tidak terlalu tinggi */
+    letter-spacing: .01em;                     /* opsional */
+  }
+  /* (opsional) sesuaikan yang panjang biar proporsional */
+  #home .namapanjang{
+    font-size: clamp(1.05rem, 5.4vw, 1.35rem);
+  }
+}
+
+/* HP sangat kecil */
+@media (max-width: 380px){
+  #home .nama{ font-size: clamp(1.9rem, 12vw, 1.2.5rem); }
+}
+
+/* ===== Masonry aman semua perangkat (CSS Grid) ===== */
+.m-grid{
+  --gap: 12px;
+  --row: 8px;                        /* tinggi unit baris untuk kalkulasi */
+  display: grid;
+  gap: var(--gap);
+  grid-auto-rows: var(--row);
+  grid-template-columns: repeat(4, 1fr);   /* desktop */
+}
+@media (max-width: 1100px){
+  .m-grid{ grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 760px){
+  .m-grid{ grid-template-columns: repeat(2, 1fr); }  /* mobile: 2 kolom */
+}
+
+.m-item{
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--paper, #fff);
+  box-shadow: var(--shadow, 0 24px 60px rgba(0,0,0,.08));
+}
+
+/* Gambar mempertahankan rasio asli (landscape/portrait oke) */
+.m-item img{
+  display: block;
+  width: 100%;
+  height: auto;                   /* biarkan tinggi natural */
+}
+
+/* Hindari transform/animasi pada container item (stabil iOS) */
+.m-item.reveal, .m-item.reveal.show{ opacity:1; transform:none; }
+
+
+
+/* Fallback: sebelum JS siap, gunakan tinggi natural (auto) supaya item tetap kelihatan */
+.m-grid:not(.is-ready){
+  grid-auto-rows: auto;                  /* <<< kunci: foto tetap tampil */
+}
+
+.m-item{ border-radius:16px; overflow:hidden; background:var(--paper,#fff); box-shadow:var(--shadow,0 24px 60px rgba(0,0,0,.08)); }
+
+/* ===== Masonry Grid: jarak rapat & 2 kolom di HP ===== */
+.m-grid{
+  --gap: 12px;                 /* desktop: rapat (boleh 10px kalau mau lebih rapat) */
+  gap: var(--gap);
+}
+
+/* tablet */
+@media (max-width: 1100px){
+  .m-grid{
+    grid-template-columns: repeat(3, 1fr);
+    --gap: 10px;
+  }
+}
+
+/* mobile */
+@media (max-width: 760px){
+  .m-grid{
+    grid-template-columns: repeat(2, 1fr);  /* ✅ 2 kolom di HP */
+    --gap: 8px;                              /* jarak lebih rapat di HP */
+  }
+}
+
+/* pastikan item tidak menambah jarak di luar gap grid */
+.m-item{ margin: 0; border-radius: 12px; box-shadow: 0 12px 24px rgba(0,0,0,.06); }
+
+/* Hilangkan ruang ekstra di item */
+.m-item{
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;     /* tak ada latar putih di bawah gambar */
+  overflow: hidden;
+}
+/* Gambar block penuh, no baseline-gap */
+.m-item img{
+  display: block;
+  width: 100%;
+  height: auto;
+}
