@@ -214,10 +214,8 @@ document.addEventListener('DOMContentLoaded', function(){
 })();
 
 
-/<!-- HTML -->
-<audio id="bgMusic" src="audio/bg.mp3" preload="metadata" autoplay loop muted></audio>
 
-<script>
+
 document.addEventListener('DOMContentLoaded', () => {
   const a = document.getElementById('bgMusic');
   if (!a) return;
@@ -255,5 +253,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('load', () => { if (allowedBefore) tryUnmute(false); });
 });
-</script>
+
 
