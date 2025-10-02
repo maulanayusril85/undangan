@@ -195,3 +195,19 @@ document.addEventListener('DOMContentLoaded', function(){
   // Pastikan setelah semuanya load (termasuk poster, font) kita rapikan lagi
   window.addEventListener('load', layout);
 });
+
+// Isi nama tamu dari URL ?to= / ?nama= / ?invite=
+(function(){
+  const el = document.getElementById('inviteName');
+  if (!el) return;
+
+  const params = new URLSearchParams(window.location.search);
+  let raw = params.get('to') || params.get('nama') || params.get('invite') || "";
+
+  // dukung format WA yang kadang pakai "+"
+  raw = raw.replace(/\+/g, ' ').trim();
+
+  // batasan wajar & sanitasi sederhana (hindari XSS): pakai textContent
+  const safe = raw.slice(0, 64);                 // potong max 64 char
+  el.textContent = safe || "Tamu Undangan";      // fallback bila kosong
+})();

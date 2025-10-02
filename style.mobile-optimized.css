@@ -519,3 +519,14 @@ hr {
   width: 100%;
   height: auto;
 }
+
+.invite-eyebrow{
+  margin: 0; opacity: .85; letter-spacing:.12em; text-transform: uppercase;
+  font-weight:600; font-size:.95rem;
+}
+.invite-name{
+  margin: 4px 0 0; font-weight:700; line-height:1.2;
+  font-size: clamp(1.3rem, 5vw, 2rem);
+  /* kalau mau handwriting: ganti font-family di sini saja */
+  /* font-family: "Great Vibes", cursive; */
+}
