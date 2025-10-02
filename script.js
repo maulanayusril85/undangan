@@ -196,18 +196,20 @@ document.addEventListener('DOMContentLoaded', function(){
   window.addEventListener('load', layout);
 });
 
-// Isi nama tamu dari URL ?to= / ?nama= / ?invite=
+// Isi nama tamu dari URL ?to=/ ?nama=/ ?invite=
 (function(){
-  const el = document.getElementById('inviteName');
-  if (!el) return;
+  const els = document.querySelectorAll('#inviteName, .invite-name');
+  if(!els.length) return;
 
-  const params = new URLSearchParams(window.location.search);
-  let raw = params.get('to') || params.get('nama') || params.get('invite') || "";
+  const p = new URLSearchParams(location.search);
+  let raw = p.get('to') || p.get('nama') || p.get('invite') || "";
 
-  // dukung format WA yang kadang pakai "+"
-  raw = raw.replace(/\+/g, ' ').trim();
+  // WA/Chrome kadang kirim + sbg spasi → normalkan
+  raw = raw.replace(/\+/g, ' ').trim().replace(/\s+/g,' ');
 
-  // batasan wajar & sanitasi sederhana (hindari XSS): pakai textContent
-  const safe = raw.slice(0, 64);                 // potong max 64 char
-  el.textContent = safe || "Tamu Undangan";      // fallback bila kosong
+  // batasi panjang & fallback
+  const name = (raw.slice(0, 64)) || "Tamu Undangan";
+
+  els.forEach(el => el.textContent = name);
 })();
+
