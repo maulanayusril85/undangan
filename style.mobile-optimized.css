@@ -521,6 +521,7 @@ hr {
 }
 
 .invite-eyebrow{
+  padding-top : 15px;
   margin: 0; opacity: .85; letter-spacing:.12em; text-transform: uppercase;
   font-weight:600; font-size:.95rem;
 }
