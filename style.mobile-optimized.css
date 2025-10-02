@@ -531,3 +531,14 @@ hr {
   /* kalau mau handwriting: ganti font-family di sini saja */
   /* font-family: "Great Vibes", cursive; */
 }
+
+/* Tombol musik kecil (pojok kanan bawah) */
+.music-btn{
+  position: fixed; right: 12px; bottom: 12px; z-index: 50;
+  padding: .55rem .8rem; border-radius: 999px; border: 1px solid rgba(0,0,0,.12);
+  background: rgba(255,255,255,.92); box-shadow: 0 8px 20px rgba(0,0,0,.18);
+  font-weight: 700; cursor: pointer;
+}
+/* Beri “pulse” halus saat musik masih muted (minta tap) */
+.music-hint #musicToggle{ animation: pulse 1.1s ease-in-out infinite; }
+@keyframes pulse{ 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
