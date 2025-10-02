@@ -220,16 +220,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const a = document.getElementById('bgMusic');
   if (!a) return;
 
-  // pastikan mulai (muted) — ini biasanya lolos di semua browser
+  // start muted (lolos kebijakan)
   a.play().catch(()=>{});
 
   const allowedBefore = localStorage.getItem('musicAllowed') === '1';
 
+  // coba unmute + fade-in
   const tryUnmute = async (persist=false) => {
     try {
       a.muted = false;
-      a.volume = 0;               // fade-in halus
-      await a.play();             // jika diblokir, akan throw
+      a.volume = 0;
+      await a.play(); // jika diblokir, akan throw
       const iv = setInterval(() => {
         a.volume = Math.min(1, a.volume + 0.12);
         if (a.volume >= 1) clearInterval(iv);
@@ -239,19 +240,24 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) { /* tetap muted jika diblokir */ }
   };
 
+  // unmute saat ada interaksi apa pun (tanpa tombol musik khusus)
   const unlock = () => tryUnmute(true);
   const events = ['pointerdown','click','touchstart','keydown','scroll'];
   const addUnlockers = () => events.forEach(ev => window.addEventListener(ev, unlock, { once:true, passive:true }));
   const removeUnlockers = () => events.forEach(ev => window.removeEventListener(ev, unlock, { passive:true }));
 
+  // jika pernah diizinkan, coba langsung unmute
   if (allowedBefore) {
-    tryUnmute(false);             // kunjungan berikutnya biasanya langsung bunyi
+    tryUnmute(false);
   } else {
-    addUnlockers();               // unmute pada interaksi apa pun
-    setTimeout(()=>tryUnmute(false), 800); // nudge kecil
+    addUnlockers();
+    // nudge kecil—beberapa browser baru mengizinkan setelah beberapa saat
+    setTimeout(() => tryUnmute(false), 800);
   }
 
+  // kalau halaman sudah fully loaded, coba lagi (desktop sering lolos)
   window.addEventListener('load', () => { if (allowedBefore) tryUnmute(false); });
 });
+
 
 
