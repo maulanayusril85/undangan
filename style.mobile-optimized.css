@@ -533,4 +533,10 @@ hr {
 }
 
 
+/* Kunci scroll saat gate aktif */
+html.is-locked, body.is-locked{
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
 
