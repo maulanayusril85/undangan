@@ -213,49 +213,72 @@ document.addEventListener('DOMContentLoaded', function(){
   els.forEach(el => el.textContent = name);
 })();
 
-// Autoplay muted → unmute saat gesture scroll/klik/tap/keydown (tanpa tombol/overlay)
+
+// Autoplay muted → unmute pada gesture (scroll/klik/tap/keydown)
+// Dengan Web Audio unlock agar iOS/Chrome iOS lebih nurut.
 document.addEventListener('DOMContentLoaded', () => {
-  const a = document.getElementById('bgMusic');
-  if (!a) return;
+  const audio = document.getElementById('bgMusic');
+  if (!audio) return;
 
-  // mulai muted (nyaris selalu lolos)
-  a.play().catch(()=>{});
+  // Mulai muted (umumnya lolos di semua browser)
+  audio.play().catch(()=>{});
 
-  const allowedBefore = localStorage.getItem('musicAllowed') === '1';
+  const AC  = window.AudioContext || window.webkitAudioContext;
+  let ctx   = null;
+  let src   = null;
+  let tried = false;
 
-  const tryUnmute = async (persist=false) => {
-    try {
-      a.muted = false;
-      a.volume = 0;                 // fade-in halus
-      await a.play();               // kalau diblokir, akan throw
+  async function unlock(persist=false){
+    if (tried) return;              // cegah double-run
+    tried = true;
+
+    try{
+      // Siapkan Web Audio graph (sekali saja)
+      if (AC && !ctx){
+        ctx = new AC();
+        if (ctx.state === 'suspended') await ctx.resume();
+        try{
+          src = ctx.createMediaElementSource(audio);
+          src.connect(ctx.destination);
+        }catch(e){
+          // kalau sudah pernah dihubungkan pada reload, abaikan
+        }
+      }
+
+      // Unmute + "nudge" iOS
+      audio.muted = false;
+      try { audio.currentTime += 0.000001; } catch(e){}
+
+      // Fade-in halus
+      audio.volume = 0;
+      await audio.play();                 // kalau tetap diblokir, akan melempar
       const iv = setInterval(() => {
-        a.volume = Math.min(1, a.volume + 0.12);
-        if (a.volume >= 1) clearInterval(iv);
+        audio.volume = Math.min(1, audio.volume + 0.12);
+        if (audio.volume >= 1) clearInterval(iv);
       }, 70);
+
       if (persist) localStorage.setItem('musicAllowed','1');
-      removeUnlockers();
-    } catch (e) { /* tetap muted jika masih diblokir */ }
-  };
-
-  const onInteract = () => tryUnmute(true);
-  const events = ['scroll','click','pointerdown','touchstart','keydown'];
-
-  function addUnlockers(){
-    events.forEach(ev => window.addEventListener(ev, onInteract, { once:true, passive:true }));
-  }
-  function removeUnlockers(){
-    events.forEach(ev => window.removeEventListener(ev, onInteract, { passive:true }));
+    }catch(e){
+      // Gagal (device benar2 strict) → izinkan coba lagi di gesture berikutnya
+      tried = false;
+    }
   }
 
-  if (allowedBefore) {
-    tryUnmute(false);               // kalau sudah pernah diizinkan, coba langsung
+  // Gesture apa pun => unmute (tanpa tombol, tanpa overlay)
+  const events = ['scroll','wheel','pointerdown','touchstart','click','keydown'];
+  const handler = () => unlock(true);
+  events.forEach(ev => document.addEventListener(ev, handler, { once:true, passive:true }));
+
+  // Kalau user sudah pernah mengizinkan, coba langsung unmute otomatis
+  if (localStorage.getItem('musicAllowed') === '1'){
+    unlock(false);
   } else {
-    addUnlockers();                 // tunggu gesture (scroll/klik/tap/keydown)
-    setTimeout(() => tryUnmute(false), 800); // nudge kecil; kadang jadi boleh
+    // Nudge kecil: beberapa browser jadi mengizinkan setelah jeda
+    setTimeout(() => unlock(false), 900);
   }
 
-  // desktop sering lebih longgar → coba lagi saat full load
-  window.addEventListener('load', () => { if (allowedBefore) tryUnmute(false); });
+  // Desktop sering lebih longgar → coba lagi saat full load
+  window.addEventListener('load', () => { if (localStorage.getItem('musicAllowed') === '1') unlock(false); });
 });
 
 
