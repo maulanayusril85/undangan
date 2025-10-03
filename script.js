@@ -213,6 +213,50 @@ document.addEventListener('DOMContentLoaded', function(){
   els.forEach(el => el.textContent = name);
 })();
 
+// Autoplay muted → unmute saat gesture scroll/klik/tap/keydown (tanpa tombol/overlay)
+document.addEventListener('DOMContentLoaded', () => {
+  const a = document.getElementById('bgMusic');
+  if (!a) return;
+
+  // mulai muted (nyaris selalu lolos)
+  a.play().catch(()=>{});
+
+  const allowedBefore = localStorage.getItem('musicAllowed') === '1';
+
+  const tryUnmute = async (persist=false) => {
+    try {
+      a.muted = false;
+      a.volume = 0;                 // fade-in halus
+      await a.play();               // kalau diblokir, akan throw
+      const iv = setInterval(() => {
+        a.volume = Math.min(1, a.volume + 0.12);
+        if (a.volume >= 1) clearInterval(iv);
+      }, 70);
+      if (persist) localStorage.setItem('musicAllowed','1');
+      removeUnlockers();
+    } catch (e) { /* tetap muted jika masih diblokir */ }
+  };
+
+  const onInteract = () => tryUnmute(true);
+  const events = ['scroll','click','pointerdown','touchstart','keydown'];
+
+  function addUnlockers(){
+    events.forEach(ev => window.addEventListener(ev, onInteract, { once:true, passive:true }));
+  }
+  function removeUnlockers(){
+    events.forEach(ev => window.removeEventListener(ev, onInteract, { passive:true }));
+  }
+
+  if (allowedBefore) {
+    tryUnmute(false);               // kalau sudah pernah diizinkan, coba langsung
+  } else {
+    addUnlockers();                 // tunggu gesture (scroll/klik/tap/keydown)
+    setTimeout(() => tryUnmute(false), 800); // nudge kecil; kadang jadi boleh
+  }
+
+  // desktop sering lebih longgar → coba lagi saat full load
+  window.addEventListener('load', () => { if (allowedBefore) tryUnmute(false); });
+});
 
 
 
