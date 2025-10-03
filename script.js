@@ -399,4 +399,37 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 
+// TAMPILKAN RESPON GOOGLE SHEETS (tanpa lib eksternal)
+(async function(){
+  const SHEET_ID   = 'GANTI_DENGAN_SHEET_IDMU';
+  const SHEET_NAME = 'Form Responses 1'; // atau nama lembar yang dipakai
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?`+
+              `tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}&tq=${encodeURIComponent('order by C desc')}`;
+  // Catatan: urutan kolom asumsi: A=Nama, B=Pesan, C=Timestamp (ubah query bila perlu)
+
+  const box = document.getElementById('gbList');
+  if (!box) return;
+
+  try{
+    const res = await fetch(url, { cache:'no-store' });
+    const txt = await res.text();
+    const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}')+1));
+    const rows = json.table.rows || [];
+    box.innerHTML = rows.map(r=>{
+      const nama = r.c[0]?.v || 'Tamu';
+      const pesan= r.c[1]?.v || '';
+      const waktu= r.c[2]?.f || r.c[2]?.v || '';
+      return `<article class="gb-card">
+        <h4 class="gb-name">${nama}</h4>
+        <div class="gb-time">${waktu}</div>
+        <p class="gb-msg">${pesan.replace(/</g,"&lt;")}</p>
+      </article>`;
+    }).join('') || '<p class="muted">Belum ada pesan.</p>';
+  }catch(e){
+    console.warn('Gagal memuat guestbook:', e);
+    box.innerHTML = '<p class="muted">Tidak bisa memuat pesan saat ini.</p>';
+  }
+})();
+
+
 
