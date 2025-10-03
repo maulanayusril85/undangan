@@ -216,48 +216,84 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
 
+// Autoplay agresif + unmute via gesture "apa saja" (tanpa tombol khusus)
 document.addEventListener('DOMContentLoaded', () => {
-  const a = document.getElementById('bgMusic');
-  if (!a) return;
+  const audio = document.getElementById('bgMusic');
+  const layer = document.getElementById('unlockLayer');
+  if (!audio || !layer) return;
 
-  // start muted (lolos kebijakan)
-  a.play().catch(()=>{});
+  // Coba mulai muted (pasti lolos)
+  audio.play().catch(()=>{});
 
-  const allowedBefore = localStorage.getItem('musicAllowed') === '1';
-
-  // coba unmute + fade-in
-  const tryUnmute = async (persist=false) => {
-    try {
-      a.muted = false;
-      a.volume = 0;
-      await a.play(); // jika diblokir, akan throw
-      const iv = setInterval(() => {
-        a.volume = Math.min(1, a.volume + 0.12);
-        if (a.volume >= 1) clearInterval(iv);
-      }, 70);
-      if (persist) localStorage.setItem('musicAllowed','1');
-      removeUnlockers();
-    } catch (e) { /* tetap muted jika diblokir */ }
-  };
-
-  // unmute saat ada interaksi apa pun (tanpa tombol musik khusus)
-  const unlock = () => tryUnmute(true);
-  const events = ['pointerdown','click','touchstart','keydown','scroll'];
-  const addUnlockers = () => events.forEach(ev => window.addEventListener(ev, unlock, { once:true, passive:true }));
-  const removeUnlockers = () => events.forEach(ev => window.removeEventListener(ev, unlock, { passive:true }));
-
-  // jika pernah diizinkan, coba langsung unmute
-  if (allowedBefore) {
-    tryUnmute(false);
-  } else {
-    addUnlockers();
-    // nudge kecil—beberapa browser baru mengizinkan setelah beberapa saat
-    setTimeout(() => tryUnmute(false), 800);
+  // Siapkan Web Audio untuk iOS
+  let ctx, node, connected = false;
+  function connectAudioGraph(){
+    if (connected) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { connected = true; return; }
+    ctx = ctx || new AC();
+    if (ctx.state === 'suspended') { /* nanti di-resume */ }
+    try{
+      node = node || ctx.createMediaElementSource(audio);
+      node.connect(ctx.destination);
+      connected = true;
+    }catch(e){
+      // jika sudah pernah dikaitkan (reload), anggap connected
+      connected = true;
+    }
   }
 
-  // kalau halaman sudah fully loaded, coba lagi (desktop sering lolos)
-  window.addEventListener('load', () => { if (allowedBefore) tryUnmute(false); });
-});
+  async function unmute(persist=false){
+    try{
+      connectAudioGraph();
+      if (ctx && ctx.state === 'suspended') await ctx.resume();
 
+      audio.muted = false;
+      audio.volume = 0;               // fade-in halus
+      await audio.play();             // jika gagal, tetap muted
+      const iv = setInterval(() => {
+        audio.volume = Math.min(1, audio.volume + 0.12);
+        if (audio.volume >= 1) clearInterval(iv);
+      }, 70);
+
+      if (persist) localStorage.setItem('musicAllowed','1');
+      removeUnlockers();
+    }catch(e){
+      // tetap muted jika masih diblokir
+    }
+  }
+
+  function removeUnlockers(){
+    layer.remove(); // hilangkan layer tak terlihat
+    window.removeEventListener('pointerdown', onFirstGesture, opts);
+    window.removeEventListener('touchstart', onFirstGesture, opts);
+    window.removeEventListener('keydown', onFirstGesture);
+    window.removeEventListener('scroll', onFirstGesturePassive, {passive:true});
+  }
+
+  const opts = { once:true, passive:true };
+  const onFirstGesture       = () => unmute(true);
+  const onFirstGesturePassive= () => unmute(true);
+
+  // Kalau sebelumnya sudah diizinkan, coba unmute otomatis
+  if (localStorage.getItem('musicAllowed') === '1') {
+    unmute(false);
+  } else {
+    // Tampilkan layer & dengarkan gesture apapun
+    layer.style.display = 'block';
+    window.addEventListener('pointerdown', onFirstGesture, opts);
+    window.addEventListener('touchstart', onFirstGesture, opts);
+    window.addEventListener('keydown', onFirstGesture);
+    window.addEventListener('scroll', onFirstGesturePassive, { passive:true });
+
+    // Nudge kecil—kadang setelah beberapa ms boleh unmute sendiri
+    setTimeout(() => unmute(false), 900);
+  }
+
+  // Desktop sering longgar: setelah load penuh, coba lagi
+  window.addEventListener('load', () => { 
+    if (localStorage.getItem('musicAllowed') === '1') unmute(false);
+  });
+});
 
 
