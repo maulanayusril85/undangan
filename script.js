@@ -215,85 +215,50 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
 
-
-// Autoplay agresif + unmute via gesture "apa saja" (tanpa tombol khusus)
 document.addEventListener('DOMContentLoaded', () => {
-  const audio = document.getElementById('bgMusic');
-  const layer = document.getElementById('unlockLayer');
-  if (!audio || !layer) return;
+  const audio  = document.getElementById('bgMusic');
+  const splash = document.getElementById('autoplaySplash');
+  if (!audio || !splash) return;
 
-  // Coba mulai muted (pasti lolos)
+  // mulai muted (lolos policy)
   audio.play().catch(()=>{});
 
-  // Siapkan Web Audio untuk iOS
-  let ctx, node, connected = false;
-  function connectAudioGraph(){
-    if (connected) return;
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) { connected = true; return; }
-    ctx = ctx || new AC();
-    if (ctx.state === 'suspended') { /* nanti di-resume */ }
-    try{
-      node = node || ctx.createMediaElementSource(audio);
-      node.connect(ctx.destination);
-      connected = true;
-    }catch(e){
-      // jika sudah pernah dikaitkan (reload), anggap connected
-      connected = true;
-    }
-  }
+  const allowedBefore = localStorage.getItem('musicAllowed') === '1';
 
-  async function unmute(persist=false){
-    try{
-      connectAudioGraph();
-      if (ctx && ctx.state === 'suspended') await ctx.resume();
+  const hideSplash = () => { splash.classList.add('hide'); setTimeout(()=>{ splash.hidden = true; }, 350); };
+  const showSplash = () => { splash.hidden = false; requestAnimationFrame(()=> splash.classList.remove('hide')); };
 
+  const tryUnmute = async (persist=false) => {
+    try{
       audio.muted = false;
-      audio.volume = 0;               // fade-in halus
-      await audio.play();             // jika gagal, tetap muted
+      audio.volume = 0;
+      await audio.play();
       const iv = setInterval(() => {
         audio.volume = Math.min(1, audio.volume + 0.12);
         if (audio.volume >= 1) clearInterval(iv);
       }, 70);
-
       if (persist) localStorage.setItem('musicAllowed','1');
-      removeUnlockers();
+      hideSplash();
+      return true;
     }catch(e){
-      // tetap muted jika masih diblokir
+      return false;
     }
-  }
+  };
 
-  function removeUnlockers(){
-    layer.remove(); // hilangkan layer tak terlihat
-    window.removeEventListener('pointerdown', onFirstGesture, opts);
-    window.removeEventListener('touchstart', onFirstGesture, opts);
-    window.removeEventListener('keydown', onFirstGesture);
-    window.removeEventListener('scroll', onFirstGesturePassive, {passive:true});
-  }
+  (async () => {
+    const ok = await tryUnmute(allowedBefore ? false : false);
+    if (!ok) showSplash();
+  })();
 
-  const opts = { once:true, passive:true };
-  const onFirstGesture       = () => unmute(true);
-  const onFirstGesturePassive= () => unmute(true);
-
-  // Kalau sebelumnya sudah diizinkan, coba unmute otomatis
-  if (localStorage.getItem('musicAllowed') === '1') {
-    unmute(false);
-  } else {
-    // Tampilkan layer & dengarkan gesture apapun
-    layer.style.display = 'block';
-    window.addEventListener('pointerdown', onFirstGesture, opts);
-    window.addEventListener('touchstart', onFirstGesture, opts);
-    window.addEventListener('keydown', onFirstGesture);
-    window.addEventListener('scroll', onFirstGesturePassive, { passive:true });
-
-    // Nudge kecil—kadang setelah beberapa ms boleh unmute sendiri
-    setTimeout(() => unmute(false), 900);
-  }
-
-  // Desktop sering longgar: setelah load penuh, coba lagi
-  window.addEventListener('load', () => { 
-    if (localStorage.getItem('musicAllowed') === '1') unmute(false);
+  // tap di mana saja pada overlay → unmute & simpan izin
+  const startOnAnyTap = async () => { await tryUnmute(true); };
+  ['pointerdown','touchstart','click','keydown'].forEach(ev => {
+    splash.addEventListener(ev, startOnAnyTap, { once: true, passive: true });
   });
+
+  // desktop kadang longgar → coba lagi setelah fully loaded
+  window.addEventListener('load', () => { if (allowedBefore) tryUnmute(false); });
 });
+
 
 
