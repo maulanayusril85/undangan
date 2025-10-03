@@ -327,4 +327,76 @@ document.addEventListener('DOMContentLoaded', () => {
   els.forEach(el => io.observe(el));
 })();
 
+// ===== Pesan & Kesan (tanpa login) — Web3Forms =====
+(function(){
+  const form   = document.getElementById('guestbookForm');
+  if(!form) return;
+
+  const nameEl = document.getElementById('gbName');
+  const msgEl  = document.getElementById('gbMsg');
+  const btn    = document.getElementById('gbSubmit');
+  const stat   = document.getElementById('gbStatus');
+  const count  = document.getElementById('gbCount');
+
+  // 1) Prefill nama dari URL ?to= / ?nama= / ?invite=
+  (function(){
+    const p = new URLSearchParams(location.search);
+    let raw = p.get('to') || p.get('nama') || p.get('invite') || '';
+    raw = raw.replace(/\+/g,' ').trim().replace(/\s+/g,' ');
+    if(raw) nameEl.value = raw.slice(0, 64);
+  })();
+
+  // 2) Hitung karakter (maks 300)
+  function updateCount(){
+    const max = 300;
+    const v = msgEl.value.slice(0, max);
+    if (v !== msgEl.value){ msgEl.value = v; }
+    if (count) count.textContent = String(v.length);
+  }
+  msgEl.addEventListener('input', updateCount); updateCount();
+
+  // 3) Submit via fetch (AJAX)
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+
+    // validasi sederhana
+    if (!nameEl.value.trim() || !msgEl.value.trim()){
+      stat.textContent = 'Nama dan pesan wajib diisi.';
+      return;
+    }
+
+    // siapkan payload
+    const data = new FormData(form);
+    // tambahan metadata (opsional)
+    data.append('from_site', location.origin + location.pathname);
+
+    // UI state
+    btn.disabled = true;
+    btn.textContent = 'Mengirim…';
+    stat.textContent = '';
+
+    try{
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: data
+      });
+      const json = await res.json();
+
+      if (json.success){
+        stat.textContent = 'Terima kasih! Pesanmu sudah terkirim 🙏';
+        form.reset(); updateCount();
+      } else {
+        stat.textContent = 'Gagal mengirim. Coba lagi sebentar.';
+        console.warn(json);
+      }
+    }catch(err){
+      stat.textContent = 'Terjadi gangguan jaringan. Coba lagi.';
+      console.error(err);
+    }finally{
+      btn.disabled = false;
+      btn.textContent = 'Kirim';
+    }
+  });
+})();
+
 
