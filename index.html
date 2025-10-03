@@ -180,6 +180,41 @@
   </div>
   </section>
 
+  <section id="guestbook" class="section section--guestbook">
+  <div class="container">
+    <h2 class="h2 reveal">Pesan &amp; Kesan</h2>
+    <p class="muted text-center small reveal">
+      Tinggalkan ucapan dan doa terbaik untuk kami ✨
+    </p>
+
+    <form id="guestbookForm" class="panel reveal" novalidate>
+      <!-- Web3Forms: ganti akses key -->
+      <input type="hidden" name="access_key" value="c70abe35-46dd-474a-8c16-2588a13eddbd">
+      <!-- (opsional) subjek email -->
+      <input type="hidden" name="subject" value="Pesan & Kesan — Rizky & Fauza">
+      <!-- anti-bot honey-pot -->
+      <input type="checkbox" name="botcheck" class="hidden" style="display:none">
+
+      <div class="gb-row">
+        <label for="gbName">Nama</label>
+        <input id="gbName" name="name" type="text" placeholder="Nama lengkap" required>
+      </div>
+
+      <div class="gb-row">
+        <label for="gbMsg">Pesan / Doa</label>
+        <textarea id="gbMsg" name="message" rows="4" placeholder="Tulis pesanmu di sini…" required></textarea>
+        <div class="gb-help"><span id="gbCount">0</span>/300</div>
+      </div>
+
+      <div class="gb-actions">
+        <button type="submit" class="btn btn--brand" id="gbSubmit">Kirim</button>
+        <span id="gbStatus" class="gb-status" aria-live="polite"></span>
+      </div>
+    </form>
+  </div>
+  </section>
+
+
   <footer class="footer">
     <div class="container text-center">
       <p class="muted reveal">Terima kasih atas doa dan kehadiran. Sampai jumpa di hari bahagia kami.</p>
