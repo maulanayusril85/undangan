@@ -214,71 +214,59 @@ document.addEventListener('DOMContentLoaded', function(){
 })();
 
 
-// Autoplay muted → unmute pada gesture (scroll/klik/tap/keydown)
-// Dengan Web Audio unlock agar iOS/Chrome iOS lebih nurut.
+// Lock di hero; "Lihat Undangan" => unmute audio + unlock + scroll ke #home
 document.addEventListener('DOMContentLoaded', () => {
-  const audio = document.getElementById('bgMusic');
-  if (!audio) return;
+  const html   = document.documentElement;
+  const body   = document.body;
+  const btn    = document.getElementById('openInvite');
+  const audio  = document.getElementById('bgMusic');
+  const target = document.getElementById('home');
 
-  // Mulai muted (umumnya lolos di semua browser)
-  audio.play().catch(()=>{});
+  if (!btn || !audio || !target) return;
 
-  const AC  = window.AudioContext || window.webkitAudioContext;
-  let ctx   = null;
-  let src   = null;
-  let tried = false;
+  // 1) Kunci scroll & siapkan audio muted agar ready
+  html.classList.add('is-locked');
+  body.classList.add('is-locked');
+  audio.play().catch(()=>{}); // warm-up muted (lolos policy)
 
-  async function unlock(persist=false){
-    if (tried) return;              // cegah double-run
-    tried = true;
+  // (opsional) siapkan Web Audio agar iOS lebih patuh
+  const AC = window.AudioContext || window.webkitAudioContext;
+  let ctx, node;
+  function connectGraph(){
+    if (!AC || ctx) return;
+    ctx = new AC();
+    try{
+      node = ctx.createMediaElementSource(audio);
+      node.connect(ctx.destination);
+    }catch(e){ /* ignore kalau sudah pernah tersambung */ }
+  }
+
+  async function openInvite(e){
+    e.preventDefault();               // cegah langsung lompat anchor
+    connectGraph();
+    if (ctx && ctx.state === 'suspended') { try{ await ctx.resume(); }catch(e){} }
 
     try{
-      // Siapkan Web Audio graph (sekali saja)
-      if (AC && !ctx){
-        ctx = new AC();
-        if (ctx.state === 'suspended') await ctx.resume();
-        try{
-          src = ctx.createMediaElementSource(audio);
-          src.connect(ctx.destination);
-        }catch(e){
-          // kalau sudah pernah dihubungkan pada reload, abaikan
-        }
-      }
-
-      // Unmute + "nudge" iOS
-      audio.muted = false;
-      try { audio.currentTime += 0.000001; } catch(e){}
-
-      // Fade-in halus
+      // 2) Unmute + fade-in
+      audio.muted  = false;
       audio.volume = 0;
-      await audio.play();                 // kalau tetap diblokir, akan melempar
+      await audio.play();             // gesture klik -> diizinkan
       const iv = setInterval(() => {
-        audio.volume = Math.min(1, audio.volume + 0.12);
+        audio.volume = Math.min(1, audio.volume + 0.15);
         if (audio.volume >= 1) clearInterval(iv);
       }, 70);
-
-      if (persist) localStorage.setItem('musicAllowed','1');
-    }catch(e){
-      // Gagal (device benar2 strict) → izinkan coba lagi di gesture berikutnya
-      tried = false;
+    }catch(err){
+      // kalau gagal, biarkan tetap muted; user tetap bisa lanjut
+      console.warn('Gagal memulai audio:', err);
     }
+
+    // 3) Buka kunci & scroll halus ke #home
+    html.classList.remove('is-locked');
+    body.classList.remove('is-locked');
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // Gesture apa pun => unmute (tanpa tombol, tanpa overlay)
-  const events = ['scroll','wheel','pointerdown','touchstart','click','keydown'];
-  const handler = () => unlock(true);
-  events.forEach(ev => document.addEventListener(ev, handler, { once:true, passive:true }));
-
-  // Kalau user sudah pernah mengizinkan, coba langsung unmute otomatis
-  if (localStorage.getItem('musicAllowed') === '1'){
-    unlock(false);
-  } else {
-    // Nudge kecil: beberapa browser jadi mengizinkan setelah jeda
-    setTimeout(() => unlock(false), 900);
-  }
-
-  // Desktop sering lebih longgar → coba lagi saat full load
-  window.addEventListener('load', () => { if (localStorage.getItem('musicAllowed') === '1') unlock(false); });
+  btn.addEventListener('click', openInvite, { passive: false });
 });
 
 
