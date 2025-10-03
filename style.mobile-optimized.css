@@ -540,3 +540,19 @@ html.is-locked, body.is-locked{
   overscroll-behavior: contain;
 }
 
+
+/* Fade-up khusus galeri Masonry Grid */
+.section--gallery .m-grid .m-item.reveal{
+  opacity: 0;
+  transform: translateY(14px);
+}
+.section--gallery .m-grid .m-item.reveal.show{
+  opacity: 1;
+  transform: none;
+  transition: opacity .9s ease, transform .9s ease;
+}
+
+/* (opsional) stagger halus */
+.section--gallery .m-grid .m-item.reveal:nth-child(2n){ transition-delay: .05s; }
+.section--gallery .m-grid .m-item.reveal:nth-child(3n){ transition-delay: .10s; }
+
