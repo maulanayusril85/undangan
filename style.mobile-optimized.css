@@ -532,33 +532,5 @@ hr {
   /* font-family: "Great Vibes", cursive; */
 }
 
-/* layer tak terlihat: menangkap tap pertama lalu hilang */
-.unlock-layer{
-  position: fixed; inset: 0;
-  background: transparent;        /* benar-benar tak terlihat */
-  z-index: 9999;
-  touch-action: manipulation;
-  cursor: default;
-}
-
-.autoplay-splash{
-  position: fixed; inset: 0; z-index: 9999;
-  display: grid; place-items: center;
-  background: rgba(0,0,0,.45);
-  backdrop-filter: blur(6px);
-  opacity: 1; transition: opacity .35s ease;
-}
-.autoplay-splash.hide{ opacity: 0; pointer-events: none; visibility: hidden; }
-
-.autoplay-card{
-  width: min(92vw, 420px);
-  background: var(--paper, #fff);
-  border: 1px solid rgba(0,0,0,.06);
-  border-radius: 18px;
-  box-shadow: var(--shadow, 0 24px 60px rgba(0,0,0,.08));
-  padding: 22px 18px; text-align: center;
-}
-.autoplay-title{ font-family: var(--font-heading, inherit); font-size: clamp(1.2rem, 4.8vw, 1.6rem); margin: 0 0 6px; }
-.autoplay-sub{ color: var(--muted, #6b7280); margin: 0; }
 
 
