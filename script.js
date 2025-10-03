@@ -270,4 +270,41 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// ===== Auto-pause ketika tab tidak terlihat, auto-resume saat kembali =====
+(function(){
+  const audio = document.getElementById('bgMusic');
+  if (!audio) return;
+
+  let pausedByAuto = false;   // penanda: dipause karena background, bukan karena user
+
+  function pauseForBackground(){
+    if (!audio.paused) {
+      audio.pause();
+      pausedByAuto = true;
+    }
+  }
+  function resumeFromBackground(){
+    if (pausedByAuto) {
+      audio.play().catch(()=>{}); // iOS biasanya mengizinkan setelah ada gesture sebelumnya
+      pausedByAuto = false;
+    }
+  }
+
+  // Page Visibility API (semua browser modern, termasuk iOS/Chrome iOS)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseForBackground();
+    else                 resumeFromBackground();
+  });
+
+  // Safari/iOS tambahan: pagehide/pageshow
+  window.addEventListener('pagehide', pauseForBackground);
+  window.addEventListener('pageshow', () => { if (!document.hidden) resumeFromBackground(); });
+
+  // (opsional) jika jendela kehilangan fokus → pause ringan
+  window.addEventListener('blur',  () => { if (document.hidden) pauseForBackground(); });
+  window.addEventListener('focus', () => { if (!document.hidden) resumeFromBackground(); });
+})();
+
+
+
 
