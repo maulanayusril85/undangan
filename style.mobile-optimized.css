@@ -556,4 +556,43 @@ html.is-locked, body.is-locked{
 .section--gallery .m-grid .m-item.reveal:nth-child(2n){ transition-delay: .05s; }
 .section--gallery .m-grid .m-item.reveal:nth-child(3n){ transition-delay: .10s; }
 
+/* === Guestbook === */
+.gb-form.panel{
+  background: var(--paper,#fff);
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:16px;
+  padding:16px;
+  box-shadow: var(--shadow,0 24px 60px rgba(0,0,0,.08));
+  max-width: 760px; margin: 12px auto 18px;
+}
+.gb-row{ margin-bottom:12px; }
+.gb-form input, .gb-form select, .gb-form textarea{
+  width:100%; border-radius:12px; border:1px solid rgba(0,0,0,.12);
+  padding:10px 12px; font:inherit; background:#fff; outline:none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.gb-form input:focus, .gb-form select:focus, .gb-form textarea:focus{
+  border-color: var(--cocoa,#91633c);
+  box-shadow: 0 0 0 3px rgba(145,99,60,.12);
+}
+.gb-help{ text-align:right; color:var(--muted,#6b7280); font-size:.9rem; margin-top:6px; }
+.gb-actions{ display:flex; align-items:center; gap:10px; }
+.gb-status{ font-size:.95rem; color:var(--muted,#6b7280); }
+
+.gb-list{ display:grid; gap:12px; max-width: 860px; margin: 0 auto; }
+.gb-card{
+  background: var(--paper,#fff);
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:16px; padding:12px 14px;
+  box-shadow: var(--shadow,0 24px 60px rgba(0,0,0,.06));
+  display:grid; grid-template-columns: 42px 1fr; gap:12px;
+}
+.gb-ava{
+  width:42px; height:42px; border-radius:50%;
+  display:grid; place-items:center; color:#fff; font-weight:700;
+}
+.gb-head{ display:flex; align-items:baseline; gap:8px; }
+.gb-name{ font-weight:700; margin:0; }
+.gb-meta{ color:var(--muted,#6b7280); font-size:.9rem; }
+.gb-msg{ margin:.25rem 0 0; line-height:1.6; white-space:pre-wrap; }
 
