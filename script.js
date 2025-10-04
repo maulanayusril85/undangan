@@ -695,3 +695,79 @@ form.addEventListener('submit', async (e)=>{
   });
 })();
 
+// ====== LOAD & RENDER GUESTBOOK dari GAS ======
+(function(){
+  const API_URL = 'PASTE_URL_EXEC_KAMU_DI_SINI'; // <-- ganti
+
+  const listEl  = document.getElementById('gbList');
+  const badgeEl = document.getElementById('gbBadge');
+  if (!listEl) return;
+
+  // helper: waktu relatif sederhana
+  function rel(ts){
+    const t = new Date(ts).getTime();
+    if (isNaN(t)) return '';
+    let d = Math.round((Date.now() - t)/1000);
+    if (d < 0 && Math.abs(d) < 90) d = 0;
+    if (d < 90) return 'baru saja';
+    const m = Math.round(d/60);   if (m < 60)  return `${m} menit lalu`;
+    const h = Math.round(m/60);   if (h < 24)  return `${h} jam lalu`;
+    const a = Math.round(h/24);   if (a < 30)  return `${a} hari lalu`;
+    const mo= Math.round(a/30);   return `${mo} bulan lalu`;
+  }
+  // helper: avatar
+  const palette = ['#845EC2','#D65DB1','#FF6F91','#FF9671','#FFC75F','#0081CF','#00C9A7','#4D8076'];
+  function avatar(name='Tamu'){
+    const ini = name.trim().split(/\s+/).slice(0,2).map(s=>s[0]).join('').toUpperCase();
+    const h = Array.from(name).reduce((a,c)=>a+c.charCodeAt(0),0);
+    return { ini, color: palette[h % palette.length] };
+  }
+  // render
+  function render(items){
+    if (badgeEl) badgeEl.textContent = items.length ? `${items.length} Ucapan` : 'Belum ada ucapan';
+
+    listEl.innerHTML = items.map(it=>{
+      const nm  = String(it.name || 'Tamu');
+      const st  = it.status ? ` · ${String(it.status)}` : '';
+      const ct  = it.count  ? ` · ${Number(it.count)} org` : '';
+      const msg = String(it.message ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      const av  = avatar(nm);
+      const when= it.ts ? rel(it.ts) : '';
+      return `
+        <article class="gb-card">
+          <div class="gb-ava" style="background:${av.color}">${av.ini}</div>
+          <div>
+            <div class="gb-head">
+              <h4 class="gb-name">${nm}</h4>
+              <div class="gb-meta">${when}${st}${ct}</div>
+            </div>
+            <p class="gb-msg">${msg}</p>
+          </div>
+        </article>`;
+    }).join('') || '<p class="muted" style="text-align:center">Belum ada ucapan.</p>';
+
+    // kalau pakai .reveal, paksa visible
+    listEl.classList.add('show');
+  }
+
+  async function load(){
+    try{
+      const res = await fetch(API_URL, { cache:'no-store' });
+      const json = await res.json();
+      console.debug('Guestbook GET:', json);
+      render(Array.isArray(json.items) ? json.items : []);
+    }catch(e){
+      console.warn('Gagal memuat guestbook:', e);
+      listEl.innerHTML = '<p class="muted" style="text-align:center">Tidak bisa memuat pesan.</p>';
+      listEl.classList.add('show');
+    }
+  }
+
+  // load awal + refresh saat kembali ke tab
+  load();
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) load(); });
+
+  // pastikan submit handler kamu memanggil load() setelah sukses kirim:
+  // contoh:
+  // if (ok) { form.reset(); updLen(); load(); }
+})();
