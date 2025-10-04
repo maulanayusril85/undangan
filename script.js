@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div>
             <div class="gb-head">
               <h4 class="gb-name">${nm}</h4>
-              <div class="gb-meta">${when}${st}${ct}</div>
+              <div class="gb-meta">${when}</div>
             </div>
             <p class="gb-msg">${msg}</p>
           </div>
