@@ -180,6 +180,48 @@
   </div>
   </section>
 
+  <section id="guestbook" class="section section--guestbook">
+  <div class="container">
+    <h2 class="h2 reveal">Pesan &amp; Kesan</h2>
+    <p class="muted text-center small reveal"><span id="gbBadge">0</span> Ucapan</p>
+
+    <!-- Form -->
+    <form id="guestbookForm" class="gb-form panel reveal" novalidate>
+      <div class="gb-row">
+        <input id="gbName" name="name" type="text" placeholder="Nama" required>
+      </div>
+
+      <div class="gb-row">
+        <select id="gbStatus" name="status" required>
+          <option value="" disabled selected>Konfirmasi Kehadiran</option>
+          <option>Hadir</option>
+          <option>Tidak Bisa Hadir</option>
+          <option>Belum Pasti</option>
+        </select>
+      </div>
+
+      <div class="gb-row">
+        <select id="gbCount" name="count" required>
+          <option value="" disabled selected>Jumlah Tamu</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+        </select>
+      </div>
+
+      <div class="gb-row">
+        <textarea id="gbMsg" name="message" rows="4" maxlength="300" placeholder="Tulis ucapan…" required></textarea>
+        <div class="gb-help"><span id="gbLen">0</span>/300</div>
+      </div>
+
+      <div class="gb-actions">
+        <button type="submit" class="btn btn--brand" id="gbSend">Kirim</button>
+        <span class="gb-status" id="gbStatusText"></span>
+      </div>
+    </form>
+
+    <!-- List ucapan -->
+    <div id="gbList" class="gb-list reveal"></div>
+  </div>
+  </section>
 
 
 
