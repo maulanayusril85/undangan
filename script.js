@@ -466,4 +466,82 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+
+  if (!nameEl.value.trim() || !msgEl.value.trim() || !statusEl.value || !countEl.value){
+    statEl.textContent = 'Lengkapi semua kolom.';
+    return;
+  }
+
+  // payload untuk kedua backend (Apps Script / Web3Forms)
+  const payload = {
+    name:   nameEl.value.trim(),
+    status: statusEl.value,
+    count:  countEl.value,
+    message:msgEl.value.trim(),
+    ua: navigator.userAgent
+  };
+
+  // Siapkan body
+  const body = new URLSearchParams(payload); // <— simple request (tanpa header)
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Mengirim…';
+  statEl.textContent = '';
+
+  // Helper: sukses UI
+  const onOK = (msg='Terkirim, terima kasih! 🙏')=>{
+    statEl.textContent = msg;
+    form.reset(); 
+    if (typeof updLen === 'function') updLen();
+    setTimeout(load, 300); // refresh list
+  };
+
+  try{
+    // ==== Percobaan utama (CORS normal) ====
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body,              // TANPA header 'Content-Type' agar tidak preflight
+      credentials: 'omit',
+      cache: 'no-store'
+    });
+
+    // Kalau balas JSON, baca; jika tidak (opaque), anggap OK
+    let ok = false;
+    if (res.type === 'opaque') {
+      ok = true;                      // no-cors, tapi server menerima
+      console.debug('Guestbook POST opaque; assume OK');
+    } else if (res.ok) {
+      try {
+        const data = await res.json();
+        ok = data?.ok !== false && data?.success !== false;
+        console.debug('Guestbook POST JSON:', data);
+      } catch {
+        ok = true;                    // balasan non-JSON tapi status OK
+      }
+    }
+
+    if (ok) onOK();
+    else {
+      console.warn('Guestbook POST not OK:', res.status, res.statusText);
+      statEl.textContent = 'Gagal mengirim. Coba lagi.';
+    }
+
+  } catch (err){
+    console.warn('Guestbook POST error:', err);
+
+    // ==== Fallback agresif: no-cors ====
+    try{
+      await fetch(API_URL, { method:'POST', body, mode:'no-cors' });
+      onOK('Terkirim (diproses)…');   // kita tidak bisa baca respons, tapi server menerima
+    }catch(err2){
+      console.error('Guestbook POST fallback failed:', err2);
+      statEl.textContent = 'Gangguan jaringan. Coba lagi.';
+    }
+  } finally{
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Kirim';
+  }
+});
+
 
