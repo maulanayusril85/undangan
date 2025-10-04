@@ -545,3 +545,153 @@ form.addEventListener('submit', async (e)=>{
 });
 
 
+// ====== Guestbook: LOAD & RENDER dari Google Apps Script ======
+(function(){
+  const API_URL = 'PASTE_URL_EXEC_APPS_SCRIPT_KAMU_DI_SINI'; // <— ganti ini
+
+  const form     = document.getElementById('guestbookForm');
+  const nameEl   = document.getElementById('gbName');
+  const statusEl = document.getElementById('gbStatus');
+  const countEl  = document.getElementById('gbCount');
+  const msgEl    = document.getElementById('gbMsg');
+  const sendBtn  = document.getElementById('gbSend');
+  const statEl   = document.getElementById('gbStatusText');
+  const lenEl    = document.getElementById('gbLen');
+
+  const listEl   = document.getElementById('gbList');
+  const badge    = document.getElementById('gbBadge');
+
+  if (!form || !listEl) return;
+
+  // Prefill nama dari ?to= / ?nama= / ?invite=
+  (function(){
+    const p = new URLSearchParams(location.search);
+    let raw = p.get('to') || p.get('nama') || p.get('invite') || '';
+    raw = raw.replace(/\+/g,' ').trim().replace(/\s+/g,' ');
+    if (raw) nameEl.value = raw.slice(0,64);
+  })();
+
+  // Counter pesan
+  function updLen(){
+    const v = msgEl.value.slice(0,300);
+    if (v !== msgEl.value) msgEl.value = v;
+    if (lenEl) lenEl.textContent = String(v.length);
+  }
+  msgEl.addEventListener('input', updLen); updLen();
+
+  // Helper UI
+  function showLoading(){ listEl.innerHTML = '<p class="muted" style="text-align:center">Memuat…</p>'; }
+  function showError(){   listEl.innerHTML = '<p class="muted" style="text-align:center">Tidak bisa memuat pesan.</p>'; }
+
+  // Waktu relatif (untuk meta)
+  const rtf = new Intl.RelativeTimeFormat('id', { numeric:'auto' });
+  function rel(dateStr){
+    const t = new Date(dateStr).getTime();
+    if (isNaN(t)) return '';
+    const diff = t - Date.now();
+    const mins = Math.round(Math.abs(diff)/60000);
+    if (mins < 60)  return rtf.format(Math.sign(diff)*mins, 'minute');
+    const hrs = Math.round(mins/60);
+    if (hrs < 24)   return rtf.format(Math.sign(diff)*hrs, 'hour');
+    const days = Math.round(hrs/24);
+    if (days < 30)  return rtf.format(Math.sign(diff)*days, 'day');
+    const mons = Math.round(days/30);
+    return rtf.format(Math.sign(diff)*mons, 'month');
+  }
+
+  // Avatar warna + inisial
+  const palette = ['#845EC2','#D65DB1','#FF6F91','#FF9671','#FFC75F','#0081CF','#00C9A7','#4D8076'];
+  function avatar(name){
+    const n = (name||'Tamu').trim();
+    const ini = n.split(/\s+/).slice(0,2).map(s=>s[0]).join('').toUpperCase();
+    const h = Array.from(n).reduce((a,c)=>a+c.charCodeAt(0),0);
+    return { ini, color: palette[h % palette.length] };
+  }
+
+  function render(items){
+    if (badge) badge.textContent = items.length;
+    listEl.innerHTML = items.map(it=>{
+      const av = avatar(it.name);
+      const when = it.ts ? rel(it.ts) : '';
+      const status = it.status ? ` · ${it.status}` : '';
+      const count  = it.count  ? ` · ${it.count} org` : '';
+      const safeMsg = String(it.message||'').replace(/</g,'&lt;');
+      return `
+        <article class="gb-card">
+          <div class="gb-ava" style="background:${av.color}">${av.ini}</div>
+          <div>
+            <div class="gb-head">
+              <h4 class="gb-name">${it.name || 'Tamu'}</h4>
+              <div class="gb-meta">${when}${status}${count}</div>
+            </div>
+            <p class="gb-msg">${safeMsg}</p>
+          </div>
+        </article>`;
+    }).join('') || '<p class="muted" style="text-align:center">Belum ada pesan.</p>';
+  }
+
+  async function load(){
+    if (!API_URL){ showError(); console.warn('API_URL kosong'); return; }
+    try{
+      showLoading();
+      const res = await fetch(API_URL, { cache:'no-store' });
+      if (!res.ok){ showError(); console.warn('GET not ok', res.status); return; }
+      const json = await res.json();
+      console.debug('Guestbook GET:', json);
+      const items = (json && json.items) ? json.items : [];
+      render(items);
+    }catch(e){
+      console.warn('Guestbook GET error:', e);
+      showError();
+    }
+  }
+
+  // Load awal + refresh saat kembali ke tab
+  load();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+
+  // SUBMIT — kirim ke Apps Script (tanpa header custom, hindari preflight)
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if (!nameEl.value.trim() || !msgEl.value.trim() || !statusEl.value || !countEl.value){
+      if (statEl) statEl.textContent = 'Lengkapi semua kolom.';
+      return;
+    }
+
+    const body = new URLSearchParams({
+      name: nameEl.value.trim(),
+      status: statusEl.value,
+      count: countEl.value,
+      message: msgEl.value.trim(),
+      ua: navigator.userAgent
+    });
+
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Mengirim…';
+    if (statEl) statEl.textContent = '';
+
+    try{
+      const res = await fetch(API_URL, { method:'POST', body, cache:'no-store' });
+      let ok = false;
+      if (res.type === 'opaque'){ ok = true; }
+      else if (res.ok){
+        const data = await res.json().catch(()=>({ok:true}));
+        ok = data?.ok !== false;
+      }
+      if (ok){
+        if (statEl) statEl.textContent = 'Terkirim, terima kasih! 🙏';
+        form.reset(); updLen();
+        load();  // refresh list setelah kirim
+      }else{
+        if (statEl) statEl.textContent = 'Gagal mengirim. Coba lagi.';
+      }
+    }catch(err){
+      if (statEl) statEl.textContent = 'Gangguan jaringan. Coba lagi.';
+      console.warn('POST error:', err);
+    }finally{
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Kirim';
+    }
+  });
+})();
+
