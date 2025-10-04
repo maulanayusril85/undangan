@@ -556,45 +556,4 @@ html.is-locked, body.is-locked{
 .section--gallery .m-grid .m-item.reveal:nth-child(2n){ transition-delay: .05s; }
 .section--gallery .m-grid .m-item.reveal:nth-child(3n){ transition-delay: .10s; }
 
-/* Guestbook styles */
-.section--guestbook .panel{
-  background: var(--paper,#fff);
-  border:1px solid rgba(0,0,0,.06);
-  border-radius:18px;
-  box-shadow: var(--shadow,0 24px 60px rgba(0,0,0,.08));
-  padding:18px;
-  max-width: 720px;
-  margin: 12px auto 0;
-}
-#guestbook .gb-row{ margin-bottom:14px; }
-#guestbook label{ display:block; font-weight:600; margin-bottom:6px; }
-#guestbook input[type="text"],
-#guestbook textarea{
-  width:100%; padding:10px 12px; border-radius:12px;
-  border:1px solid rgba(0,0,0,.12); background:#fff; font:inherit;
-  outline:none; transition:border-color .2s ease, box-shadow .2s ease;
-}
-#guestbook input[type="text"]:focus,
-#guestbook textarea:focus{
-  border-color: var(--cocoa,#91633c);
-  box-shadow: 0 0 0 3px rgba(145,99,60,.12);
-}
-#guestbook .gb-help{
-  text-align:right; color:var(--muted,#6b7280); font-size:.88rem; margin-top:6px;
-}
-#guestbook .gb-actions{ display:flex; align-items:center; gap:10px; }
-#guestbook .gb-status{ font-size:.95rem; color:var(--muted,#6b7280); }
-@media (max-width:600px){
-  .section--guestbook .panel{ padding:14px; border-radius:14px; }
-}
-
-.gb-list{ display:grid; gap:12px; }
-.gb-card{
-  background:var(--paper,#fff); border:1px solid rgba(0,0,0,.06);
-  border-radius:14px; box-shadow:var(--shadow,0 24px 60px rgba(0,0,0,.08));
-  padding:12px 14px;
-}
-.gb-name{ font-weight:700; margin:0 0 4px; }
-.gb-time{ color:var(--muted,#6b7280); font-size:.9rem; margin:0 0 6px; }
-.gb-msg{ margin:0; line-height:1.6; white-space:pre-wrap; }
 
