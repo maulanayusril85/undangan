@@ -596,3 +596,70 @@ html.is-locked, body.is-locked{
 .gb-meta{ color:var(--muted,#6b7280); font-size:.9rem; }
 .gb-msg{ margin:.25rem 0 0; line-height:1.6; white-space:pre-wrap; }
 
+/* --- Guestbook: rapikan ukuran field agar tidak keluar panel --- */
+#guestbook .gb-form,
+#guestbook .gb-form * { box-sizing: border-box; }
+
+#guestbook .gb-form { 
+  overflow: hidden;                /* hindari bleed di sudut panel */
+  max-width: 760px; 
+  margin-inline: auto;
+}
+
+#guestbook .gb-row { 
+  margin: 0 0 12px; 
+}
+
+/* Pastikan elemen form tidak melewati lebar panel */
+#guestbook .gb-form input[type="text"],
+#guestbook .gb-form select,
+#guestbook .gb-form textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;                    /* fix overflow di flex/grid container */
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0,0,0,.12);
+  background: #fff;
+  font: inherit;
+  outline: none;
+}
+
+/* textarea: teks panjang tetap rapi */
+#guestbook .gb-form textarea {
+  resize: vertical;
+  min-height: 120px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* fokus */
+#guestbook .gb-form input:focus,
+#guestbook .gb-form select:focus,
+#guestbook .gb-form textarea:focus{
+  border-color: var(--cocoa,#91633c);
+  box-shadow: 0 0 0 3px rgba(145,99,60,.12);
+}
+
+/* baris tombol/status */
+#guestbook .gb-actions { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+}
+
+/* --- Tuning mobile --- */
+@media (max-width: 600px){
+  #guestbook .gb-form { 
+    padding: 14px; 
+    border-radius: 14px; 
+  }
+  /* cegah auto-zoom di iOS */
+  #guestbook .gb-form input,
+  #guestbook .gb-form select,
+  #guestbook .gb-form textarea { font-size: 16px; }
+}
+
+
