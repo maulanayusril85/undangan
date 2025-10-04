@@ -662,4 +662,16 @@ html.is-locked, body.is-locked{
   #guestbook .gb-form textarea { font-size: 16px; }
 }
 
+.gb-list{ display:grid; gap:12px; max-width:860px; margin:0 auto; }
+.gb-card{
+  background: var(--paper,#fff);
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:16px; padding:12px 14px;
+  box-shadow: var(--shadow,0 24px 60px rgba(0,0,0,.06));
+  display:grid; grid-template-columns:42px 1fr; gap:12px;
+}
+.gb-ava{ width:42px; height:42px; border-radius:50%; display:grid; place-items:center; color:#fff; font-weight:700; }
+.gb-name{ margin:0; font-weight:700; }
+.gb-meta{ color:var(--muted,#6b7280); font-size:.9rem; }
+.gb-msg{ margin:.25rem 0 0; line-height:1.6; white-space:pre-wrap; }
 
