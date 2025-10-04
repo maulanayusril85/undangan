@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== Guestbook: kirim & tampil =====
 (function(){
-  const API_URL = 'https://script.google.com/macros/s/AKfycbyXueBLG5ztKAT6v20-RhIde_5Xferknj26wf3nDoyt5BPJ6Z_YCYOZRFeUWfwlaC4q/exec';  // <-- ganti ini
+  const API_URL = 'https://script.google.com/macros/s/AKfycbyYDYF8DbKVDmdO1VCzKrjhSjl9VfmHNsZY7Gb2COP_0cpoBFviIMP3FmGi0pGwqz7z/exec';  // <-- ganti ini
 
   const form   = document.getElementById('guestbookForm');
   const nameEl = document.getElementById('gbName');
