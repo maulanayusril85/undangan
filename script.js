@@ -383,8 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const nm   = String(it.name || 'Tamu');
       const av   = avatar(nm);
       const when = it.ts ? rel(it.ts) : '';
-      const st   = it.status ? ` · ${String(it.status)}` : '';
-      const ct   = it.count  ? ` · ${Number(it.count)} org` : '';
+      
       const msg  = String(it.message ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
       return `
         <article class="gb-card">
